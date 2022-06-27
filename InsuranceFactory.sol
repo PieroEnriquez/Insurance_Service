@@ -44,6 +44,10 @@ contract InsuranceFactory is BasicOperations{
     mapping(string => service)  public mappingService;
     mapping(address => lab) public mappingLabs;
 
+    address[] insuredAddresses;
+    string[] private nameServices;
+    address[] labsAddresses;
+
     //Function for an insured to know if he/she has authorization
     function functionOnlyInsured(address _address) public view{
         require(mappingInsured[_address].authorization == true, "This address is not authorized");
@@ -65,6 +69,15 @@ contract InsuranceFactory is BasicOperations{
         || company == _requestingAddress);
         _;
     }
+
+    event BuyedTokens(uint256);
+    event NewLab(address, address);
+    event NewInsured(address, address);
+    event NewService(string, uint256);
+    event InsuredOff(address);
+    event ServiceOff(string);
+
+
 
 
 }
