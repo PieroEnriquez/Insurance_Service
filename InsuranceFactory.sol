@@ -77,7 +77,27 @@ contract InsuranceFactory is BasicOperations{
     event InsuredOff(address);
     event ServiceOff(string);
 
+    function newLab() public{
+        labsAddresses.push(msg.sender);
+        address labAddress = address(new Laboratory(msg.sender, insurance));
+        mappingLabs[msg.sender] = lab(labAddress, true);
+        emit NewLab(msg.sender, labAddress);
+    }
 
+
+
+}
+
+contract Laboratory is BasicOperations{
+
+    //Declaring the addresses
+    address public labAddress;
+    address insuranceContract;
+
+    constructor(address _account, address _insuranceContract){
+        labAddress = _account;
+        insuranceContract = _insuranceContract;
+    }
 
 
 }
