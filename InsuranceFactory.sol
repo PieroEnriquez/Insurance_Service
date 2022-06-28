@@ -20,7 +20,7 @@ contract InsuranceFactory is BasicOperations{
     struct insured{
         address clientAddress;
         bool authorization;
-        address contractAdress;
+        address contractAddress;
     }
 
     struct service{
@@ -94,6 +94,28 @@ contract InsuranceFactory is BasicOperations{
         emit NewInsured(msg.sender, insuredAddress);
     }
 
+    function availableLabs() public view onlyInsurance(msg.sender) returns(address[]memory){
+        return labsAddresses;
+    }
+
+    function Insureds() public view onlyInsurance(msg.sender) returns(address[]memory){
+        return insuredAddresses;
+    }
+
+    function insuredHistoricalRecord(address _insuredAddress, address _consultingAddress) public view InsuranceOrInsured(_insuredAddress, _consultingAddress) returns(string memory){
+        string memory record = "";
+        address insuredContract = mappingInsured[_insuredAddress].contractAddress;
+
+        for(uint i=0; i<nameServices.length; i++){
+            if(mappingService[nameServices[i]].serviceState && InsuranceHealthRecord(insuredContract).InsuredServiceState(nameServices[i]) == true){
+                (string memory _nameService, uint _priceService) = InsuranceHealthRecord(insuredContract).InsuredRecord(nameServices[i]);
+                record = string(abi.encodePacked(record, "(", _nameService, ",", uint2str(_priceService), ") - "));
+            }
+        }
+        return record;
+    }
+
+
 }
 
 contract Laboratory is BasicOperations{
@@ -133,6 +155,14 @@ contract InsuranceHealthRecord is BasicOperations{
         owner.tokens = _token;
         owner.insurance = _insurance;
         owner.company = _company;
+    }
+
+    function InsuredServiceState(string memory _service) public view returns(bool){
+
+    }
+
+    function InsuredRecord(string memory) public view returns(string memory, uint){
+
     }
 
 }
