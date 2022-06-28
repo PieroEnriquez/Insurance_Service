@@ -39,6 +39,7 @@ contract InsuranceFactory is BasicOperations{
     - insured's address (address => insured)
     - service's name (string => service)
     - lab's addres (address => lab)
+    and arrays to save the insured's address, the name of the services and the addresses of the labs
     */
     mapping(address => insured) public mappingInsured;
     mapping(string => service)  public mappingService;
@@ -77,6 +78,7 @@ contract InsuranceFactory is BasicOperations{
     event InsuredOff(address);
     event ServiceOff(string);
 
+    //Function to create a new contract for a certified lab
     function newLab() public{
         labsAddresses.push(msg.sender);
         address labAddress = address(new Laboratory(msg.sender, insurance));
@@ -84,7 +86,13 @@ contract InsuranceFactory is BasicOperations{
         emit NewLab(msg.sender, labAddress);
     }
 
-
+    //Creates a new contract for an insured
+    function newInsuredContract() public{
+        insuredAddresses.push(msg.sender);
+        address insuredAddress = address(new InsuranceHealthRecord(msg.sender, token, insurance, company));
+        mappingInsured[msg.sender] = insured(msg.sender, true, insuredAddress);
+        emit NewInsured(msg.sender, insuredAddress);
+    }
 
 }
 
@@ -99,5 +107,32 @@ contract Laboratory is BasicOperations{
         insuranceContract = _insuranceContract;
     }
 
+
+}
+
+contract InsuranceHealthRecord is BasicOperations{
+
+    enum State{Up, Down}
+
+    struct Owner{
+        address ownerAddress;
+        uint ownerCash;
+        State state;
+        IERC20 tokens;
+        address insurance;
+        address payable company;
+    }
+
+    //Declaring the addresses
+    Owner owner;
+
+    constructor(address _owner, IERC20 _token, address _insurance, address payable _company){
+        owner.ownerAddress = _owner;
+        owner.ownerCash = 0;
+        owner.state = State.Up;
+        owner.tokens = _token;
+        owner.insurance = _insurance;
+        owner.company = _company;
+    }
 
 }
