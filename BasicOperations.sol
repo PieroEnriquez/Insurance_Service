@@ -1,13 +1,22 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 import "./SafeMath.sol";
+import "./AggregatorV3Interface.sol";
 
 abstract contract BasicOperations{
 
     using SafeMath for uint256;
 
+    //Adding the necessary interface for the price feed
+    AggregatorV3Interface internal priceFeed;
+
     //Constructing the contract as abstract
-    constructor(){}
+    constructor(){
+        priceFeed = AggregatorV3Interface(0x3E7d1eAB13ad0104d2750B8863b489D65364e32D);
+    }
+
+    //In this case, i'm going to use Ethereum contract of the USDT token for the price
+
 
     //Function to calculate the token price based on a stablecoin
     function calcTokenPrice(uint _numTokens) internal pure returns(uint){

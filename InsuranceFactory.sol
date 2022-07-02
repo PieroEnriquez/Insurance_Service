@@ -126,20 +126,6 @@ contract InsuranceFactory is BasicOperations{
 
 }
 
-contract Laboratory is BasicOperations{
-
-    //Declaring the addresses
-    address public labAddress;
-    address insuranceContract;
-
-    constructor(address _account, address _insuranceContract){
-        labAddress = _account;
-        insuranceContract = _insuranceContract;
-    }
-
-
-}
-
 contract InsuranceHealthRecord is BasicOperations{
 
     enum State{Up, Down}
@@ -165,21 +151,60 @@ contract InsuranceHealthRecord is BasicOperations{
         owner.company = _company;
     }
 
-    function InsuredServiceState(string memory _service) public view returns(bool){
-
+    //Struct for asked services by the client on and off the labs
+    struct askedServices{
+        string serviceName;
+        uint256 servicePrice;
+        bool serviceState;
     }
 
-    function InsuredRecord(string memory) public view returns(string memory, uint){
-
+    struct labAskedServices{
+        string serviceName;
+        uint256 servicePrice;
+        address labAddress;
     }
-    
+
+    mapping(string => askedServices) insuredRecord;
+    labAskedServices [] labInsuredRecord;
+
+    event SelfDestruct(address);
+    event TokensBack(address, uint256);
+    event PayedService(address, string, uint256);
+    event RequestLabService(address, address, string);
+        
     modifier only(address _insurance){
         require(_insurance == owner.ownerAddress, "You are not the insured");
         _;
     }
 
+    function LabInsuredRecord() public view returns(labAskedServices[]memory){
+        return labInsuredRecord;
+    }
+
+    function InsuredRecord(string memory) public view returns(string memory, uint){
+
+    }
+
+    function InsuredServiceState(string memory _service) public view returns(bool){
+
+    }
+
     function unsubscribe() public only(msg.sender){
         
     }
+
+}
+
+contract Laboratory is BasicOperations{
+
+    //Declaring the addresses
+    address public labAddress;
+    address insuranceContract;
+
+    constructor(address _account, address _insuranceContract){
+        labAddress = _account;
+        insuranceContract = _insuranceContract;
+    }
+
 
 }
