@@ -16,10 +16,10 @@ abstract contract BasicOperations{
     }
 
     //In this case, i'm going to use Ethereum contract of the USDT token for the price
-    function getThePrice() public view returns (int) {
+    function getThePrice() public view returns (uint) {
         (
             /*uint80 roundID*/,
-            int price,
+            uint price,
             /*uint startedAt*/,
             /*uint timeStamp*/,
             /*uint80 answeredInRound*/
@@ -27,9 +27,9 @@ abstract contract BasicOperations{
        return price;
    }
 
-    //Function to calculate the token price based on a stablecoin
-    function calcTokenPrice(uint _numTokens) internal pure returns(uint){
-        return _numTokens = 0;
+    //Function to calculate the token price based on a stablecoin by the relation of 1 token per 5 USDTs
+    function calcTokenPrice(uint _numTokens) internal view returns(uint){
+        return _numTokens.mul(5*(getThePrice()));
     }
 
     //Function to get the balance of required tokens in the contract
