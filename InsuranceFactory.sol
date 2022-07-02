@@ -11,7 +11,7 @@ contract InsuranceFactory is BasicOperations{
     address payable public company;
     
     constructor(){
-        token = new ERC20Basic(100);
+        token = new ERC20Basic(1000);
         insurance = address(this);
         company = payable(msg.sender);
     }
@@ -94,14 +94,17 @@ contract InsuranceFactory is BasicOperations{
         emit NewInsured(msg.sender, insuredAddress);
     }
 
+    //Function to see the available labs
     function availableLabs() public view onlyInsurance(msg.sender) returns(address[]memory){
         return labsAddresses;
     }
 
+    //Function to see the mapping that collects the insureds' addresses
     function Insureds() public view onlyInsurance(msg.sender) returns(address[]memory){
         return insuredAddresses;
     }
 
+    //Function to see insureds' record of services received
     function insuredHistoricalRecord(address _insuredAddress, address _consultingAddress) public view InsuranceOrInsured(_insuredAddress, _consultingAddress) returns(string memory){
         string memory record = "";
         address insuredContract = mappingInsured[_insuredAddress].contractAddress;
@@ -113,6 +116,11 @@ contract InsuranceFactory is BasicOperations{
             }
         }
         return record;
+    }
+
+    function insuredOff(address _insured) public onlyInsurance(msg.sender){
+        mappingInsured[_insured].authorization = false;
+        InsuranceHealthRecord(mappingInsured[_insured].contractAddress).unsubscribe;
     }
 
 
@@ -163,6 +171,15 @@ contract InsuranceHealthRecord is BasicOperations{
 
     function InsuredRecord(string memory) public view returns(string memory, uint){
 
+    }
+    
+    modifier only(address _insurance){
+        require(_insurance == owner.ownerAddress, "You are not the insured");
+        _;
+    }
+
+    function unsubscribe() public only(msg.sender){
+        
     }
 
 }
