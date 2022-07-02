@@ -10,13 +10,22 @@ abstract contract BasicOperations{
     //Adding the necessary interface for the price feed
     AggregatorV3Interface internal priceFeed;
 
-    //Constructing the contract as abstract
+    //Constructing the contract as abstract plus the data feed from the USDT contract
     constructor(){
         priceFeed = AggregatorV3Interface(0x3E7d1eAB13ad0104d2750B8863b489D65364e32D);
     }
 
     //In this case, i'm going to use Ethereum contract of the USDT token for the price
-
+    function getThePrice() public view returns (int) {
+        (
+            /*uint80 roundID*/,
+            int price,
+            /*uint startedAt*/,
+            /*uint timeStamp*/,
+            /*uint80 answeredInRound*/
+        ) = priceFeed.latestRoundData();
+       return price;
+   }
 
     //Function to calculate the token price based on a stablecoin
     function calcTokenPrice(uint _numTokens) internal pure returns(uint){
