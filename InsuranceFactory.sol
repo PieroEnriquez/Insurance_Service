@@ -171,26 +171,32 @@ contract InsuranceHealthRecord is BasicOperations{
     event TokensBack(address, uint256);
     event PayedService(address, string, uint256);
     event RequestLabService(address, address, string);
-        
+
+    //Modifier for only the insured to run a function
     modifier only(address _insurance){
         require(_insurance == owner.ownerAddress, "You are not the insured");
         _;
     }
 
+    //Function to see the insured's record of lab's services
     function LabInsuredRecord() public view returns(labAskedServices[]memory){
         return labInsuredRecord;
     }
 
-    function InsuredRecord(string memory) public view returns(string memory, uint){
-
+    //Function to see the last time the insured took a service
+    function InsuredRecord(string memory _service) public view returns(string memory, uint){
+        return (insuredRecord[_service].serviceName, insuredRecord[_service].servicePrice);
     }
 
+    //
     function InsuredServiceState(string memory _service) public view returns(bool){
-
+        return insuredRecord[_service].serviceState;
     }
 
+    //Function for the insured to unsubscribe from the insurance and, therefore, to destruct the insured's contract
     function unsubscribe() public only(msg.sender){
-        
+        emit SelfDestruct(msg.sender);
+        selfdestruct(payable(msg.sender));
     }
 
 }
