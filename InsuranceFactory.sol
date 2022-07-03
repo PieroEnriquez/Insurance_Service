@@ -338,6 +338,33 @@ contract Laboratory is BasicOperations{
     event ActiveService(string, uint);
     event ServiceGiven(address, string);
 
+    //Modifier for only the lab's address to run a function
+    modifier onlyLab(address _lab){
+        require(_lab == labAddress, "You don't have permission to run this function");
+        _;
+    }
+
+    //Function to create a new service
+    function newService(string memory _name, uint _price) public onlyLab(msg.sender){
+        labServices[_name] = labService(_name, _price, true);
+        nameServicesLab.push(_name);
+        emit ActiveService(_name, _price);
+    }
+
+    //Function to see all the services
+    function consultServices() public view returns(string[]memory){
+        return nameServicesLab;
+    }
+
+    //Function to get a service's price
+    function servicePrice(string memory _name) public view returns(uint){
+        return (labServices[_name].price);
+    }
+
+    //Function to see if a service is available
+    function serviceAvailability(string memory _name) public view returns(bool){
+        return (labServices[_name].availability);
+    }
 
 
 }
