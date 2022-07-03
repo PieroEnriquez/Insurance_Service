@@ -131,10 +131,27 @@ contract InsuranceFactory is BasicOperations{
         emit NewService(_name, _price);
     }
 
+    //Function for the insurance to shut down a service
+    function serviceDown(string memory _name) public onlyInsurance(msg.sender){
+        require(serviceState(_name) == true, "The service is already down");
+        mappingService[_name].serviceState = false;
+        emit ServiceOff(_name);
+    }
+
+    //Function to see the availability of a service
+    function serviceState(string memory _name) public view returns(bool){
+        return mappingService[_name].serviceState;
+    }
+
+    //
+    function servicePrice(string memory _name) public view returns(uint256){
+        require(serviceState(_name) == true, "This service is nos available right now");
+        return mappingService[_name].servicePrice;
+    }
 
 
 
-
+    //Function to buy tokens that will help later for the insured's own contract
     function buyTokens(address _insured, uint _numTokens) public payable onlyClient(msg.sender){
         _insured;
         uint256 balance = balanceOf();
@@ -144,7 +161,7 @@ contract InsuranceFactory is BasicOperations{
         emit BuyedTokens(_numTokens);
     }
 
-    //Function to get the balance of tokens from the insruance
+    //Function to get the balance of tokens from the insurance
     function balanceOf() public view returns(uint256){
         return(token.balanceOf(insurance));
     }
@@ -224,6 +241,7 @@ contract InsuranceHealthRecord is BasicOperations{
         selfdestruct(payable(msg.sender));
     }
 
+    //Function to buy tokens from the contract of the insured
     function buyTokens(uint _numTokens) public payable only(msg.sender){
         require(_numTokens > 0, "You must put a number bigger than 0");
         uint cost = calcTokenPrice(_numTokens);
@@ -233,10 +251,27 @@ contract InsuranceHealthRecord is BasicOperations{
         InsuranceFactory(owner.insurance).buyTokens(owner.ownerAddress, _numTokens);
     }
 
+    //Function to get the balance of the address
     function balanceOf() public view only(msg.sender) returns(uint256){
         return(owner.tokens.balanceOf(address(this)));
     }
 
+    function tokensBack(uint _numTokens) public payable only(msg.sender){
+        require(_numTokens > 0, "You must input an amount of tokens higher than 0");
+        require(_numTokens >= balanceOf(), "You must have the amount of tokens you want to give back");
+        owner.tokens.transfer(owner.insurance, _numTokens);
+        payable(msg.sender).transfer(calcTokenPrice(_numTokens));
+        emit TokensBack(msg.sender, _numTokens);
+    }
+
+    function askForService(string memory _service) public only(msg.sender){
+        require(InsuranceFactory(owner.insurance).serviceState(_service) == true, "This service is not available right now");
+        uint256 tokenPay = InsuranceFactory(owner.insurance).servicePrice(_service);
+        require(tokenPay >= balanceOf(), "You need to buy more tokens");
+        owner.tokens.transfer(owner.insurance, tokenPay);
+        insuredRecord[_service] = askedServices(_service, tokenPay, true);
+        emit PayedService(msg.sender, _service, tokenPay);
+    }
 }
 
 contract Laboratory is BasicOperations{
