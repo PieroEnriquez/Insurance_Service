@@ -118,11 +118,36 @@ contract InsuranceFactory is BasicOperations{
         return record;
     }
 
+    //Function to shut down an insured that unsubscribed
     function insuredOff(address _insured) public onlyInsurance(msg.sender){
         mappingInsured[_insured].authorization = false;
         InsuranceHealthRecord(mappingInsured[_insured].contractAddress).unsubscribe;
     }
 
+    //Function to set a new service
+    function newService(string memory _name, uint _price) public onlyInsurance(msg.sender){
+        mappingService[_name] = service(_name, _price, true);
+        nameServices.push(_name);
+        emit NewService(_name, _price);
+    }
+
+
+
+
+
+    function buyTokens(address _insured, uint _numTokens) public payable onlyClient(msg.sender){
+        _insured;
+        uint256 balance = balanceOf();
+        require(_numTokens <= balance, "Try buying less tokens");
+        require(_numTokens > 0, "Try buying a number of tokens higher than 0");
+        token.transfer(msg.sender, _numTokens);
+        emit BuyedTokens(_numTokens);
+    }
+
+    //Function to get the balance of tokens from the insruance
+    function balanceOf() public view returns(uint256){
+        return(token.balanceOf(insurance));
+    }
 
 }
 
@@ -188,7 +213,7 @@ contract InsuranceHealthRecord is BasicOperations{
         return (insuredRecord[_service].serviceName, insuredRecord[_service].servicePrice);
     }
 
-    //
+    //Function to see the state of a service the insured has taken
     function InsuredServiceState(string memory _service) public view returns(bool){
         return insuredRecord[_service].serviceState;
     }
@@ -197,6 +222,19 @@ contract InsuranceHealthRecord is BasicOperations{
     function unsubscribe() public only(msg.sender){
         emit SelfDestruct(msg.sender);
         selfdestruct(payable(msg.sender));
+    }
+
+    function buyTokens(uint _numTokens) public payable only(msg.sender){
+        require(_numTokens > 0, "You must put a number bigger than 0");
+        uint cost = calcTokenPrice(_numTokens);
+        require(msg.value <= cost, "You don't have enough money");
+        uint returnValue = msg.value - cost;
+        payable(msg.sender).transfer(returnValue);
+        InsuranceFactory(owner.insurance).buyTokens(owner.ownerAddress, _numTokens);
+    }
+
+    function balanceOf() public view only(msg.sender) returns(uint256){
+        return(owner.tokens.balanceOf(address(this)));
     }
 
 }
