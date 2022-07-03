@@ -308,5 +308,36 @@ contract Laboratory is BasicOperations{
         insuranceContract = _insuranceContract;
     }
 
+    //Mapping to get the last asked service by an specific address
+    mapping(address => string) public askedService;
+
+    //Array of addresses that 
+    address[]public petitionsServices;
+
+    //Mapping to relate an address with its result in a struct
+    mapping(address => resultService) resultServiceLab;
+
+    struct resultService{
+        string diagnostic;
+        string IPFScode;
+    }
+
+    //Array with the anmes of the services the lab provides
+    string[] nameServicesLab;
+
+    //Mapping to relate a service's name with its struct
+    mapping(string => labService) public labServices;
+
+    struct labService{
+        string name;
+        uint price;
+        bool availability;
+    }
+
+    //Declaring the events for the upcoming function
+    event ActiveService(string, uint);
+    event ServiceGiven(address, string);
+
+
 
 }
