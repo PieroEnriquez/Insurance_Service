@@ -143,13 +143,24 @@ contract InsuranceFactory is BasicOperations{
         return mappingService[_name].serviceState;
     }
 
-    //
+    //Function to get a service price
     function servicePrice(string memory _name) public view returns(uint256){
         require(serviceState(_name) == true, "This service is nos available right now");
         return mappingService[_name].servicePrice;
     }
 
-
+    //Function to see the available services
+    function activeServices() public view returns(string[]memory){
+        string[]memory ActiveServices = new string[](nameServices.length);
+        uint counter = 0;
+        for(uint i = 0; i<nameServices.length; i++){
+            if(serviceState(nameServices[i]) == true){
+                ActiveServices[counter] = nameServices[i];
+                counter++;
+            }
+        }
+        return ActiveServices;
+    }
 
     //Function to buy tokens that will help later for the insured's own contract
     function buyTokens(address _insured, uint _numTokens) public payable onlyClient(msg.sender){
@@ -164,6 +175,11 @@ contract InsuranceFactory is BasicOperations{
     //Function to get the balance of tokens from the insurance
     function balanceOf() public view returns(uint256){
         return(token.balanceOf(insurance));
+    }
+
+    //Function for the insurance to generate tokens
+    function generateTokens(uint _numTokens) public onlyInsurance(msg.sender){
+        token.increaseTotalSupply(_numTokens);
     }
 
 }
@@ -256,6 +272,7 @@ contract InsuranceHealthRecord is BasicOperations{
         return(owner.tokens.balanceOf(address(this)));
     }
 
+    //Function to give back non-desired tokens
     function tokensBack(uint _numTokens) public payable only(msg.sender){
         require(_numTokens > 0, "You must input an amount of tokens higher than 0");
         require(_numTokens >= balanceOf(), "You must have the amount of tokens you want to give back");
@@ -264,6 +281,7 @@ contract InsuranceHealthRecord is BasicOperations{
         emit TokensBack(msg.sender, _numTokens);
     }
 
+    //Function to ask for a service
     function askForService(string memory _service) public only(msg.sender){
         require(InsuranceFactory(owner.insurance).serviceState(_service) == true, "This service is not available right now");
         uint256 tokenPay = InsuranceFactory(owner.insurance).servicePrice(_service);
@@ -271,6 +289,11 @@ contract InsuranceHealthRecord is BasicOperations{
         owner.tokens.transfer(owner.insurance, tokenPay);
         insuredRecord[_service] = askedServices(_service, tokenPay, true);
         emit PayedService(msg.sender, _service, tokenPay);
+    }
+
+    //Function to ask for a service to an specific lab
+    function askForServiceLab(string memory _service, address _lab) public payable only(msg.sender){
+        
     }
 }
 
