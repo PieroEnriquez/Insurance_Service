@@ -293,7 +293,12 @@ contract InsuranceHealthRecord is BasicOperations{
 
     //Function to ask for a service to an specific lab
     function askForServiceLab(string memory _service, address _lab) public payable only(msg.sender){
-        
+        Laboratory labAddress = Laboratory(_lab);
+        require(msg.value == labAddress.servicePrice(_service)*getThePrice());
+        labAddress.giveService(msg.sender, _service);
+        payable(labAddress.labAddress()).transfer(labAddress.servicePrice(_service)*getThePrice());
+        labInsuredRecord.push(labAskedServices(_service, labAddress.servicePrice(_service), _lab));
+        emit RequestLabService(_lab, msg.sender, _service);
     }
 }
 
@@ -318,7 +323,7 @@ contract Laboratory is BasicOperations{
     mapping(address => resultService) resultServiceLab;
 
     struct resultService{
-        string diagnostic;
+        string diagnosis;
         string IPFScode;
     }
 
@@ -366,5 +371,25 @@ contract Laboratory is BasicOperations{
         return (labServices[_name].availability);
     }
 
+    //Function to give a service to a client
+    function giveService(address _insuredAddress, string memory _service) public{
+        InsuranceFactory IF = InsuranceFactory(insuranceContract);
+        IF.functionOnlyInsured(_insuredAddress);
+        require(labServices[_service].availability == true);
+        askedService[_insuredAddress] = _service;
+        petitionsServices.push(_insuredAddress);
+        emit ServiceGiven(_insuredAddress, _service);
+    }
+
+    //Function to publish the results for a client through a diagnosis and an image on IPFS with more details
+    function giveResults(address _insuredAddress, string memory _diagnosis, string memory _IPFScode) public onlyLab(msg.sender){
+        resultServiceLab[_insuredAddress] = resultService(_diagnosis, _IPFScode);
+    }
+
+    //Function to see the results of an specific insured
+    function seeResults(address _insuredAddress) public view returns(string memory _diagnosis, string memory _IPFScode){
+        _diagnosis = resultServiceLab[_insuredAddress].diagnosis;
+        _IPFScode = resultServiceLab[_insuredAddress].IPFScode;
+    }
 
 }
