@@ -1,0 +1,32 @@
+{
+  "name": "insurance_service",
+  "version": "1.0.0",
+  "description": "Insurance service with systems for both labs and clients",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PieroEnriquez/Insurance_Service.git"
+  },
+  "keywords": [
+    "solidity",
+    "insurance",
+    "service",
+    "smart",
+    "contracts",
+    "blockchain",
+    "solutions"
+  ],
+  "author": "Piero Enriquez",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PieroEnriquez/Insurance_Service/issues"
+  },
+  "homepage": "https://github.com/PieroEnriquez/Insurance_Service#readme",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^1.0.1",
+    "hardhat": "^2.10.1"
+  }
+}
