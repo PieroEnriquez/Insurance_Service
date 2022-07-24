@@ -1,13 +1,5 @@
-# Sample Hardhat Project
-
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
-
-Try running some of the following tasks:
-
-```shell
-npx hardhat help
-npx hardhat test
-GAS_REPORT=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.js
-```
+This project is made to work as an smart contracts for an insurance service to ve a factory
+for both a lab and a user.
+It has a variety of functions for both to rely on it, using as a base the libraries from
+OpenZeppelin and Chainlink. I'm planning to add NFTs for giving the diagnosis as the project
+is still on development.
